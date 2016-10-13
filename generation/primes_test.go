@@ -5,15 +5,29 @@ import (
 	"testing"
 )
 
-func TestMillerRabinIsPrime(t *testing.T) {
-	prime := big.NewInt(137477)
+func TestMillerRabinFirst1000Primes(t *testing.T) {
 
-	if MillerRabin(prime, 20) == false {
-		t.Fatal("Number is prime, was marked as false")
+	primes := 0
+	for i := 2; i < 1000; i++ {
+		if MillerRabin(big.NewInt(int64(i)), 20) {
+			primes++
+		}
+	}
+
+	if primes != 168 {
+		t.Fatal("Expected number of primes: 168, actual:", primes)
 	}
 }
 
-func TestMillerRabinNotPrime(t *testing.T) {
+func TestMillerRabinPrimeReturnsTrue(t *testing.T) {
+	prime := big.NewInt(100003)
+
+	if MillerRabin(prime, 20) == false {
+		t.Fatal("Number is prime, algorithm returned false")
+	}
+}
+
+func TestMillerRabinNotPrimeReturnsFalse(t *testing.T) {
 	prime := big.NewInt(7734)
 
 	if MillerRabin(prime, 20) == true {
