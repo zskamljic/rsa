@@ -1,30 +1,51 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/big"
 
-	"github.com/zskamljic/rsa/generation"
+	"github.com/zskamljic/rsa/gen"
+	"github.com/zskamljic/rsa/primes"
 )
 
 func main() {
-	/*
-			for i := 0; i < 15; i++ {
-				fmt.Println(generation.Default.Next())
-			}
+	method := flag.String("method", "", "accepts \"miller\" or \"naive\" ")
+	digits := flag.Int("digits", 0, "number of spaces that the generator will produce")
+	bits := flag.Int("bits", 0, "number of bits that the number should generate")
 
-			fmt.Println()
+	flag.Parse()
 
-		for i := 0; i < 15; i++ {
-			fmt.Println(generation.Naive())
+	var number *big.Int
+	if *digits != 0 && *bits == 0 {
+		number = gen.RandomNDigits(*digits)
+	} else if *digits == 0 && *bits != 0 {
+		number = gen.RandomNBits(uint(*bits))
+	} else {
+		if *digits == 0 && *bits == 0 {
+			fmt.Println("Must specify at least one of digits or bits")
+		} else {
+			fmt.Println("Can't specify both digits and bits")
+			return
 		}
+		return
+	}
 
-		fmt.Println()
+	fmt.Println("Generated number:")
+	fmt.Println(number)
 
-		for i := 0; i < 15; i++ {
-			fmt.Println(generation.Random(big.NewInt(0), big.NewInt(10)))
-		}
-	//*/
-	prime := big.NewInt(100003)
-	fmt.Println(generation.MillerRabin(prime, 20))
+	var isPrime bool
+	switch *method {
+	case "miller":
+		isPrime = primes.MillerRabin(number, 8)
+	case "naive":
+		isPrime = primes.Naive(number)
+	case "":
+
+	default:
+		flag.PrintDefaults()
+		return
+	}
+
+	fmt.Println("Is the number a prime?", isPrime)
 }

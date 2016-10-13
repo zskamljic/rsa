@@ -4,24 +4,19 @@ import (
 	"math/big"
 
 	"github.com/cznic/mathutil"
-	"github.com/zskamljic/rsa/generation"
+	"github.com/zskamljic/rsa/gen"
 )
 
 // Naive generates a random prime number using the naive algorithm
-func Naive() *big.Int {
-generate:
-	for {
-		r := generation.Default.Next()
+func Naive(r *big.Int) bool {
+	g := mathutil.SqrtBig(r)
 
-		g := mathutil.SqrtBig(r)
-
-		for i := big.NewInt(3); i.Cmp(g) <= 0; i.Add(i, big.NewInt(2)) {
-			if big.NewInt(0).Mod(r, i).Cmp(big.NewInt(0)) == 0 {
-				continue generate
-			}
+	for i := big.NewInt(2); i.Cmp(g) <= 0; i.Add(i, big.NewInt(1)) {
+		if big.NewInt(0).Mod(r, i).Cmp(big.NewInt(0)) == 0 {
+			return false
 		}
-		return r
 	}
+	return true
 }
 
 // MillerRabin checks if the number is a prime
@@ -52,7 +47,7 @@ func MillerRabin(r *big.Int, s int) bool {
 	genMax.Sub(genMax, big.NewInt(2))
 
 	for j := big.NewInt(1); j.Cmp(steps) <= 0; j.Add(j, big.NewInt(1)) {
-		a := generation.Random(big.NewInt(2), genMax)
+		a := gen.Random(big.NewInt(2), genMax)
 		x := big.NewInt(0).Exp(a, d, r)
 
 		if x.Cmp(big.NewInt(1)) != 0 {

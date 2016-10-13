@@ -1,8 +1,9 @@
-package generation
+package gen
 
 import (
 	"math"
 	"math/big"
+	"time"
 )
 
 // Default Lcg
@@ -26,6 +27,10 @@ func NewLcg(m, a, b, rn0 int64) *Lcg {
 		big.NewInt(b),
 		big.NewInt(rn0),
 	}
+
+	for i := time.Now().Nanosecond() % 10000; i >= 0; i-- {
+		lcg.Next()
+	}
 	return lcg
 }
 
@@ -37,16 +42,4 @@ func (lcg *Lcg) Next() *big.Int {
 		Mod(lcg.current, lcg.m)
 
 	return lcg.current
-}
-
-// Random returns a random number in range a, b
-func Random(a, b *big.Int) *big.Int {
-	mod := big.NewInt(0).Sub(b, a)
-	mod.Add(mod, big.NewInt(1))
-
-	random := Default.Next()
-
-	rhs := big.NewInt(0).Mod(random, mod)
-
-	return a.Add(a, rhs)
 }
