@@ -59,7 +59,8 @@ func MillerRabin(r *big.Int, s int) bool {
 					break
 				}
 
-				x.Exp(x, big.NewInt(2), r)
+				x = modExp(x, big.NewInt(2), r)
+				//x.Exp(x, big.NewInt(2), r)
 			}
 
 			if x.Cmp(stop) != 0 {
@@ -69,4 +70,22 @@ func MillerRabin(r *big.Int, s int) bool {
 	}
 
 	return true
+}
+
+func modExp(a, b, m *big.Int) *big.Int {
+	x := big.NewInt(1)
+	a.Mod(a, m)
+
+	for b.Cmp(big.NewInt(0)) != 0 {
+		rem := big.NewInt(0).Set(b)
+		rem.Mod(rem, big.NewInt(2))
+
+		if rem.Cmp(big.NewInt(1)) == 0 {
+			x.Mul(x, a).Mod(x, m)
+		}
+		b.Rsh(b, 1)
+		a.Mul(a, a).Mod(a, m)
+	}
+
+	return x
 }
