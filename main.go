@@ -28,6 +28,12 @@ func main() {
 
 		fmt.Println(message)
 
-		cipher.GenerateCipher(*digits)
+		cipher := cipher.GenerateCipher(*digits)
+		cipher.SaveKeys()
+
+		encoded := cipher.Encode(message)
+
+		fmt.Println(encoded)
+		fmt.Println(string(cipher.Decode(encoded)))
 	}
 }
