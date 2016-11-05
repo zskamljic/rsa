@@ -38,3 +38,26 @@ func TestModLinEquation(t *testing.T) {
 	assert.NotNil(x)
 	assert.Equal(big.NewInt(1), x)
 }
+
+func TestModExpPreservesValues(t *testing.T) {
+	assert := assert.New(t)
+
+	// ARRANGE
+	aOrig := big.NewInt(8)
+	bOrig := big.NewInt(868)
+	mOrig := big.NewInt(100)
+
+	a := big.NewInt(0).Set(aOrig)
+	b := big.NewInt(0).Set(bOrig)
+	m := big.NewInt(0).Set(mOrig)
+	res := big.NewInt(16)
+
+	// ACT
+	x := ModExp(a, b, m)
+
+	// ASSERT
+	assert.Equal(aOrig, a)
+	assert.Equal(bOrig, b)
+	assert.Equal(mOrig, m)
+	assert.Equal(res, x)
+}

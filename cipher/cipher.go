@@ -84,17 +84,41 @@ func (c *Cipher) SaveKeys() {
 func (c *Cipher) Encode(message string) []byte {
 	messageBytes := []byte(message)
 
-	m := big.NewInt(0).SetBytes(messageBytes)
-	encoded := util.ModExp(m, c.e, c.n)
+	out := []byte{}
+	for _, v := range messageBytes {
+		m := big.NewInt(int64(v))
+		encoded := util.ModExp(m, c.e, c.n)
 
-	return encoded.Bytes()
+		bytes := encoded.Bytes()
+		out = append(out, byte(len(bytes)))
+		out = append(out, bytes...)
+	}
+	//m := big.NewInt(0).SetBytes(messageBytes)
+	//fmt.Println(m)
+	//encoded := util.ModExp(m, c.e, c.n)
+	//decoded := util.ModExp(encoded, c.d, c.n)
+	//fmt.Println(decoded)
+
+	return out
 }
 
 // Decode decodes the message from data
 func (c *Cipher) Decode(data []byte) []byte {
-	d := big.NewInt(0).SetBytes(data)
 
-	m := util.ModExp(d, c.d, c.n)
+	var message []byte
+	for len(data) > 0 {
+		var len byte
+		len, data = data[0], data[1:]
 
-	return m.Bytes()
+		var encoded []byte
+		encoded, data = data[:len], data[len:]
+
+		d := big.NewInt(0).SetBytes(encoded)
+		m := util.ModExp(d, c.d, c.n)
+		message = append(message, m.Bytes()...)
+	}
+	//d := big.NewInt(0).SetBytes(data)
+	//m := util.ModExp(d, c.d, c.n)
+
+	return message
 }

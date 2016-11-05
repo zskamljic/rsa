@@ -39,17 +39,19 @@ func ExtendedEuclid(a, b *big.Int) (d, x, y *big.Int) {
 // ModExp calculates modular exponent a^b (mod m)
 func ModExp(a, b, m *big.Int) *big.Int {
 	x := big.NewInt(1)
-	a.Mod(a, m)
+	aParam := big.NewInt(0).Set(a)
+	bParam := big.NewInt(0).Set(b)
+	aParam.Mod(aParam, m)
 
-	for b.Cmp(big.NewInt(0)) != 0 {
-		rem := big.NewInt(0).Set(b)
+	for bParam.Cmp(big.NewInt(0)) != 0 {
+		rem := big.NewInt(0).Set(bParam)
 		rem.Mod(rem, big.NewInt(2))
 
 		if rem.Cmp(big.NewInt(1)) == 0 {
-			x.Mul(x, a).Mod(x, m)
+			x.Mul(x, aParam).Mod(x, m)
 		}
-		b.Rsh(b, 1)
-		a.Mul(a, a).Mod(a, m)
+		bParam.Rsh(bParam, 1)
+		aParam.Mul(aParam, aParam).Mod(aParam, m)
 	}
 
 	return x
