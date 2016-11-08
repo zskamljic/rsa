@@ -4,9 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"math/big"
-	"strings"
-
 	"os"
+	"strings"
 
 	"github.com/zskamljic/rsa/util"
 )
@@ -121,4 +120,17 @@ func (c *Cipher) Decode(data string) []byte {
 	}
 
 	return message
+}
+
+// EncodeInt encodes a big integer to byte
+func (c *Cipher) EncodeInt(i *big.Int) string {
+	encoded := util.ModExp(i, c.e, c.n)
+	return encoded.String()
+}
+
+// DecodeInt decodes a big integer from bytes
+func (c *Cipher) DecodeInt(data string) *big.Int {
+	decoded, _ := big.NewInt(0).SetString(data, 10)
+
+	return util.ModExp(decoded, c.d, c.n)
 }
