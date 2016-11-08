@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"math/big"
+	"strings"
 
 	"os"
 
@@ -81,17 +82,21 @@ func (c *Cipher) SaveKeys() {
 }
 
 // Encode encodes the message to []byte
-func (c *Cipher) Encode(message string) []byte {
+func (c *Cipher) Encode(message string) string {
 	messageBytes := []byte(message)
 
-	out := []byte{}
+	msgLen := int64(len(message))
+
+	out := fmt.Sprintf("%v", util.ModExp(big.NewInt(msgLen), c.e, c.n))
+
 	for _, v := range messageBytes {
 		m := big.NewInt(int64(v))
 		encoded := util.ModExp(m, c.e, c.n)
 
-		bytes := encoded.Bytes()
-		out = append(out, byte(len(bytes)))
-		out = append(out, bytes...)
+		out += fmt.Sprintf(" %v", encoded)
+		//bytes := encoded.Bytes()
+		//out = append(out, byte(len(bytes)))
+		//out = append(out, bytes...)
 	}
 	//m := big.NewInt(0).SetBytes(messageBytes)
 	//fmt.Println(m)
@@ -103,22 +108,25 @@ func (c *Cipher) Encode(message string) []byte {
 }
 
 // Decode decodes the message from data
-func (c *Cipher) Decode(data []byte) []byte {
+func (c *Cipher) Decode(data string) []byte {
+
+	numbers := strings.Fields(data)
+	msgLen, _ := big.NewInt(0).SetString(numbers[0], 10)
+	msgLen = util.ModExp(msgLen, c.d, c.n)
+	numbers = numbers[1:]
 
 	var message []byte
-	for len(data) > 0 {
-		var len byte
-		len, data = data[0], data[1:]
+	for len(numbers) > 0 {
+		number, _ := big.NewInt(0).SetString(numbers[0], 10)
+		numbers = numbers[1:]
 
-		var encoded []byte
-		encoded, data = data[:len], data[len:]
-
-		d := big.NewInt(0).SetBytes(encoded)
-		m := util.ModExp(d, c.d, c.n)
-		message = append(message, m.Bytes()...)
+		number = util.ModExp(number, c.d, c.n)
+		message = append(message, number.Bytes()...)
 	}
-	//d := big.NewInt(0).SetBytes(data)
-	//m := util.ModExp(d, c.d, c.n)
+
+	if msgLen.Cmp(big.NewInt(int64(len(message)))) != 0 {
+		return nil
+	}
 
 	return message
 }

@@ -6,6 +6,9 @@ import "math/big"
 func Random(a, b *big.Int) *big.Int {
 	mod := big.NewInt(0).Sub(b, a)
 	mod.Add(mod, big.NewInt(1))
+	if mod.Cmp(big.NewInt(0)) == 0 {
+		mod.SetInt64(1)
+	}
 
 	random := Default.Next()
 
@@ -22,8 +25,6 @@ func RandomNDigits(digits int) *big.Int {
 	min.Exp(min, big.NewInt(int64(digits-1)), nil)
 	max.Exp(max, big.NewInt(int64(digits)), nil)
 	max.Sub(max, big.NewInt(1))
-	//min := int64(math.Pow(10, float64(digits-1)))
-	//max := int64(math.Pow(10, float64(digits)) - 1)
 
 	return Random(min, max)
 }
