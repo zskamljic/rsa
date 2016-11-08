@@ -1,51 +1,39 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
-	"math/big"
+	"os"
 
-	"github.com/zskamljic/rsa/gen"
-	"github.com/zskamljic/rsa/primes"
+	"github.com/zskamljic/rsa/cipher"
 )
 
 func main() {
-	method := flag.String("method", "", "accepts \"miller\" or \"naive\" ")
-	digits := flag.Int("digits", 0, "number of spaces that the generator will produce")
-	bits := flag.Int("bits", 0, "number of bits that the number should generate")
+	decode := flag.Bool("decode", false, "")
+	digits := flag.Int("digits", 10, "the number of digits for p and q")
 
 	flag.Parse()
 
-	var number *big.Int
-	if *digits != 0 && *bits == 0 {
-		number = gen.RandomNDigits(*digits)
-	} else if *digits == 0 && *bits != 0 {
-		number = gen.RandomNBits(uint(*bits))
+	scanner := bufio.NewReader(os.Stdin)
+
+	if *decode {
+		fmt.Println("Decode!")
 	} else {
-		if *digits == 0 && *bits == 0 {
-			fmt.Println("Must specify at least one of digits or bits")
-		} else {
-			fmt.Println("Can't specify both digits and bits")
-			return
+		fmt.Print("Message to encode: ")
+		message, err := scanner.ReadString('\n')
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
 		}
-		return
+
+		fmt.Println(message)
+
+		cipher := cipher.GenerateCipher(*digits)
+		cipher.SaveKeys()
+
+		encoded := cipher.Encode(message)
+
+		fmt.Println(encoded)
+		fmt.Println(string(cipher.Decode(encoded)))
 	}
-
-	fmt.Println("Generated number:")
-	fmt.Println(number)
-
-	var isPrime bool
-	switch *method {
-	case "miller":
-		isPrime = primes.MillerRabin(number, 8)
-	case "naive":
-		isPrime = primes.Naive(number)
-	case "":
-
-	default:
-		flag.PrintDefaults()
-		return
-	}
-
-	fmt.Println("Is the number a prime?", isPrime)
 }

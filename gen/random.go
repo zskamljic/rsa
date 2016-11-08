@@ -1,14 +1,14 @@
 package gen
 
-import (
-	"math"
-	"math/big"
-)
+import "math/big"
 
 // Random returns a random number in range a, b
 func Random(a, b *big.Int) *big.Int {
 	mod := big.NewInt(0).Sub(b, a)
 	mod.Add(mod, big.NewInt(1))
+	if mod.Cmp(big.NewInt(0)) == 0 {
+		mod.SetInt64(1)
+	}
 
 	random := Default.Next()
 
@@ -19,10 +19,14 @@ func Random(a, b *big.Int) *big.Int {
 
 // RandomNDigits returns a random number with n digits
 func RandomNDigits(digits int) *big.Int {
-	min := int64(math.Pow(10, float64(digits-1)))
-	max := int64(math.Pow(10, float64(digits)) - 1)
+	min := big.NewInt(10)
+	max := big.NewInt(10)
 
-	return Random(big.NewInt(min), big.NewInt(max))
+	min.Exp(min, big.NewInt(int64(digits-1)), nil)
+	max.Exp(max, big.NewInt(int64(digits)), nil)
+	max.Sub(max, big.NewInt(1))
+
+	return Random(min, max)
 }
 
 // RandomNBits generates a random number that is n bits long

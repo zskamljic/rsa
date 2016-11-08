@@ -5,6 +5,7 @@ import (
 
 	"github.com/cznic/mathutil"
 	"github.com/zskamljic/rsa/gen"
+	"github.com/zskamljic/rsa/util"
 )
 
 // Naive generates a random prime number using the naive algorithm
@@ -59,7 +60,7 @@ func MillerRabin(r *big.Int, s int) bool {
 					break
 				}
 
-				x.Exp(x, big.NewInt(2), r)
+				x = util.ModExp(x, big.NewInt(2), r)
 			}
 
 			if x.Cmp(stop) != 0 {
