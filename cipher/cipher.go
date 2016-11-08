@@ -77,8 +77,8 @@ func (c *Cipher) SaveKeys() {
 	writer := bufio.NewWriter(out)
 	defer writer.Flush()
 
-	writer.WriteString(fmt.Sprintf("Public: %v, %v\n", c.e, c.n))
-	writer.WriteString(fmt.Sprintf("Private: %v, %v\n", c.d, c.n))
+	writer.WriteString(fmt.Sprintf("%v, %v\n", c.e, c.n))
+	writer.WriteString(fmt.Sprintf("%v, %v\n", c.d, c.n))
 }
 
 // Encode encodes the message to []byte
@@ -94,15 +94,7 @@ func (c *Cipher) Encode(message string) string {
 		encoded := util.ModExp(m, c.e, c.n)
 
 		out += fmt.Sprintf(" %v", encoded)
-		//bytes := encoded.Bytes()
-		//out = append(out, byte(len(bytes)))
-		//out = append(out, bytes...)
 	}
-	//m := big.NewInt(0).SetBytes(messageBytes)
-	//fmt.Println(m)
-	//encoded := util.ModExp(m, c.e, c.n)
-	//decoded := util.ModExp(encoded, c.d, c.n)
-	//fmt.Println(decoded)
 
 	return out
 }
